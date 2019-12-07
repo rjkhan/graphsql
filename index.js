@@ -7,8 +7,8 @@ const mysql = require("mysql");
 
 const db = require("./database_config/db_config.js");
 
-var dbCon = new db("project","root","root","Rabnawazs-MacBook-Pro.local",mysql);
-dbCon.create_connection();
+//var dbCon = new db("project","root","root","Rabnawazs-MacBook-Pro.local",mysql);
+//dbCon.create_connection();
 
 const server = new ApolloServer({ typeDefs, resolvers });
 

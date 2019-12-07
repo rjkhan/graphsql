@@ -1,36 +1,45 @@
-class DB{
+const Sequelize = require('sequelize')
 
-    //consturtor
-    constructor(db_name,user,password,host,handler) {
-        this.db_name = db_name;
-        this.password = password;
-        this.user = user;
-        this.host = host;
-        this.handler = handler;
+var db = {}
 
+const sequelize = new Sequelize('sample', 'root', 'root', {
+    host: 'Rabnawazs-MacBook-Pro.local',
+    port: '3306',
+    dialect: 'mysql',
+    define: {
+        freezeTableName: true,
+    },
+    pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+    },
+    // http://docs.sequelizejs.com/manual/tutorial/querying.html#operators
+    operatorsAliases: false,
+})
+
+let models = [
+    require('./models/priorities.js'),
+    require('./models/status.js'),
+    require('./models/tickets.js'),
+    require('./models/users.js'),
+]
+
+// Initialize models
+models.forEach(model => {
+    const seqModel = model(sequelize, Sequelize)
+    db[seqModel.name] = seqModel
+})
+
+// Apply associations
+Object.keys(db).forEach(key => {
+    if ('associate' in db[key]) {
+        db[key].associate(db)
     }
+})
 
+db.sequelize = sequelize
+db.Sequelize = Sequelize
 
-    create_connection(){
-         this.connection = this.handler.createConnection({
-            host: this.host,
-            user: this.user,
-            password: this.password,
-            database: this.db_name
-        });
-        
-        // test connection
-        this.connection.connect((err) => {
-            if (err) throw err;
-            console.log('Connected!');
-        });
-    }
-
-    close_connection(){
-        this.connection.end();
-    }
-
-}
-
-
-module.exports = DB;
+module.exports = db
